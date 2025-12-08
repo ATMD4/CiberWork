@@ -410,7 +410,7 @@ Este trabalho permitiu aplicar na prática os conceitos teóricos sobre vulnerab
 
 4. **Impacto Real**: Reconhecemos que XSS não é apenas uma vulnerabilidade teórica - tem impacto real em utilizadores finais, permitindo roubo de credenciais, sessões e dados sensíveis.
 
-### O Que Depreendemos das Vulnerabilidades
+### O Que Conseguimos Deduzir das Vulnerabilidades
 
 **Lições Principais:**
 
@@ -493,4 +493,5 @@ Cibersegurança - Licenciatura em Engenharia de Sistemas e Tecnologias Informát
 
 **Docente Responsável da Unidade Curricuar:**
 -
+
  Joel David Valente Guerreiro
