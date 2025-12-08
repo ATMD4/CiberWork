@@ -38,14 +38,26 @@ Para a identificação e análise destas vulnerabilidades, foram utilizadas as s
 **Identificação:**
 - **CVE ID**: CVE-2021-42548
 - **Plugin Afetado**: WP Cloud Plugins Share-OneDrive
-- **Versões Vulneráveis**: Versões anteriores à correção
+- **Versões Vulneráveis**: Todas as versões anteriores à 1.15.3 (≤ 1.15.2)
 - **Plataforma**: WordPress
 - **Tipo de Vulnerabilidade**: Reflected Cross-Site Scripting (XSS)
-- **Severidade**: Média a Alta
+- **Severidade**: CVSS base score 4.7 – Medium
 
 **Sistemas Afetados:**
 
 Esta vulnerabilidade afeta qualquer site WordPress que utilize o plugin WP Cloud Plugins Share-OneDrive nas versões vulneráveis. O plugin é utilizado para integração com o Microsoft OneDrive, permitindo partilhar e gerir ficheiros diretamente através do WordPress.
+
+**Deteção:**
+
+- **Onde:**
+    Na funcionalidade de pesquisa (search functionality) do plugin Share-one-Drive (WP Cloud Plugins) para WordPress, onde havia validação insuficiente dos dados de entrada. 
+    
+    A vulnerabilidade foi reportada e registada no âmbito do Switzerland Government Common Vulnerability Program / NCSC (National Cyber Security Centre da Suíça), que aparece como fonte oficial do CVE.
+    
+    
+- **Quando:**
+   A vulnerabilidade foi publicamente divulgada a 13 de dezembro de 2021, data usada tanto pela NVD (National Vulnerability Database) como pelo NCSC da Suíça e outras bases de dados (CVE Details, WPScan).
+   
 
 ****
 
@@ -261,8 +273,9 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 
 **Identificação:**
 - **CVE ID**: CVE-2014-6278
-- **Sistema/Aplicação Afetada**: GNU Bash (Bourne Again SHell)
+- **Sistema/Aplicação Afetada**: GNU Bash (Bourne Again Shell)
 - **Versões Vulneráveis**: Versões do Bash até à 4.3
+- **Plataforma** : Sistemas operativos que utilizem GNU Bash como shell
 - **Tipo de Vulnerabilidade**: Injeção de Comandos / Execução Remota de Código (RCE)
 - **Severidade**: Crítica (CVSS v2: 10.0 / CVSS v3: 9.8)
 
@@ -270,7 +283,17 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 
 A vulnerabilidade afeta sistemas operativos baseados em Unix/Linux (como Debian, Ubuntu, CentOS, RedHat) e macOS que utilizam o Bash como interpretador de comandos padrão. No contexto deste trabalho, o sistema afetado foi a VM Pentester Lab (Debian Wheezy 32-bit) a correr um servidor web Apache configurado para executar scripts CGI (/cgi-bin/status).
 
-**Ações e Objetivos:**
+**Deteção:**
+
+- **Onde:**
+    Na implementação do interpretador de comandos GNU Bash, mais concretamente na forma como o Bash trata funções definidas em variáveis de ambiente. Esta vulnerabilidade é uma variante da falha conhecida como Shellshock, permitindo injeção de comandos no sistema operativo quando Bash é chamado por serviços que recebem dados externos.
+    
+- **Quando:**
+    Foi identificada e documentada em setembro de 2014, pouco depois da divulgação inicial do Shellshock (CVE-2014-6271).
+
+****
+
+**Ações, Objetivos e Resultados de Exploração:**
 
 O objetivo do atacante é explorar o processamento incorreto de variáveis de ambiente pelo Bash. Ao injetar código malicioso, o atacante pretende:
 
