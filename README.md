@@ -13,8 +13,8 @@ Para este trabalho, foram selecionadas duas vulnerabilidades críticas para aná
 
 As vulnerabilidades XSS (Cross-Site Scripting) representam uma das maiores ameaças em aplicações web, permitindo que atacantes injetem código malicioso que é executado no navegador das vítimas. O XSS não visa diretamente servidores ou hosts, mas sim os clientes que utilizam esses servidores, tornando-o particularmente perigoso em ambientes com múltiplos utilizadores.
 
-2. **[Segunda Vulnerabilidade - A Definir]**
-
+2. **GNU Bash OS Command Injection Vulnerability - CVE-2014-6278**
+A vulnerabilidade GNU Bash OS Command Injection (CVE-2014-6278), relacionada com o Shellshock, afeta o interpretador de comandos Bash, muito usado em sistemas Unix e Linux. Ela permite que um atacante injete e execute comandos maliciosos através de variáveis de ambiente manipuladas, sobretudo em serviços que chamam o Bash (como scripts CGI em servidores web). Por afetar um componente central do sistema, pode levar a execução remota de código (RCE) e ao controlo do servidor comprometido.
 
 
 ### Metodologias de Deteção Utilizadas
