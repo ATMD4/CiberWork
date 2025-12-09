@@ -267,6 +267,12 @@ if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 }
 ```
 
+**7. Consultar Cheat-Sheet de Prevenção de XSS (durante desenvolvimento da devida webapp):**
+
+https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+
+
+
 ## Vulnerabilidade 2: GNU Bash OS Command Injection Vulnerability - CVE-2014-6278
 
 ### Apresentação da Vulnerabilidade
@@ -495,3 +501,4 @@ Cibersegurança - Licenciatura em Engenharia de Sistemas e Tecnologias Informát
 -
 
  Joel David Valente Guerreiro
+
