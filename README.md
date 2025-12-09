@@ -21,13 +21,30 @@ A vulnerabilidade GNU Bash OS Command Injection (CVE-2014-6278), relacionada com
 
 Para a identificação e análise destas vulnerabilidades, foram utilizadas as seguintes metodologias:
 
+#### Reflected XSS na funcionalidade de pesquisa do WordPress - WP Cloud Plugins Share-OneDrive (CVE-2021-42548):
+
 - **Análise de CVE (Common Vulnerabilities and Exposures)**: Pesquisa em bases de dados públicas de vulnerabilidades, nomeadamente no site NVD (National Vulnerability Database), cortesia do Instituto Nacional de Padrões e Tecnologia do EUA.
 
 - **Testes de Penetração**: Simulação de ataques XSS em ambientes controlados.
 
-- **Análise de Código-Fonte**: Revisão do código para identificar falhas de validação e sanitização de entradas
-- **Ferramentas Automatizadas**: Utilização de scanners de vulnerabilidades web
-- **Testes Manuais**: Injeção de cargas úteis XSS personalizadas para confirmar a exploração
+- **Análise de Código-Fonte**: Revisão do código para identificar falhas de validação e sanitização de entradas.
+
+- **Ferramentas Automatizadas**: Utilização de scanners de vulnerabilidades web.
+
+- **Testes Manuais**: Injeção de cargas úteis XSS personalizadas para confirmar a exploração.
+
+#### GNU Bash OS Command Injection Vulnerability - CVE-2014-6278:
+
+- **Varrimento de Rede**: Utilização do nmap em modo ping scan para identificar o endereço IP ativo da máquina vítima na rede local.
+
+- **Enumeração de Serviço Web e CGI**: Uso do curl com pedidos HTTP do tipo HEAD para confirmar a acessibilidade do servidor web Apache e a existência do script CGI vulnerável.
+
+- **Testes de Penetração Direcionados**: Injeção manual de payloads maliciosos no cabeçalho HTTP User-Agent através do curl.
+
+- **Estabelecimento de Reverse Shell**: Configuração de um listener em nc (Netcat) no sistema atacante e envio de um payload que forçava a máquina vítima a iniciar uma ligação reversa, permitindo obter uma shell interativa remota.
+
+- **Validação Pós-Exploração e Escalada de Privilégios**: Execução de comandos no sistema comprometido para confirmar o sucesso da exploração, seguida da estabilização da shell  e tentativa de escalada de privilégios para utilizador root utilizando sudo.
+
 
 ---
 
